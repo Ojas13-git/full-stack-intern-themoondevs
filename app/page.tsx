@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { setToken } from '@/redux/auth/auth.slice';
+import { setToken, setUser, clearAuth } from '@/redux/auth/auth.slice';
 import useAuthSession from '../hooks/useAuthSession';
 import { useAppDispatch } from '@/redux/store';
 import axios from 'axios';
@@ -34,6 +34,12 @@ const HomePage = () => {
         {user ? (
           <div>
             <h2 className="text-xl font-bold">Welcome, {user.username}</h2>
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-2 mt-6 font-bold text-white bg-red-500 rounded-md"
+            >
+              Logout
+            </button>
           </div>
         ) : (
           <div>
@@ -60,17 +66,6 @@ const HomePage = () => {
             </button>
           </div>
         )}
-        <div className="mt-6 p-4 border rounded-md text-black bg-gray-50">
-          <h3 className="text-lg font-semibold">The hook should be usable like this: </h3>
-          <pre className="mt-2 p-2 text-gray-500 bg-gray-100 rounded-md">
-            <code>
-              {`const { user } = useAuthSession();
-if (user) {
-  console.log('User:', user.username);
-}`}
-            </code>
-          </pre>
-        </div>
       </div>
     </div>
   );
