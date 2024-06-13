@@ -5,6 +5,7 @@ import { setToken, setUser, clearAuth } from '@/redux/auth/auth.slice';
 import useAuthSession from '../hooks/useAuthSession';
 import { useAppDispatch } from '@/redux/store';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const HomePage = () => {
   const [username, setUsername] = useState('');
@@ -37,6 +38,7 @@ const HomePage = () => {
 
   const handleLogin = async () => {
     if (!validateForm()) {
+      toast.error('Please fix the errors in the form.');
       return;
     }
 
@@ -45,9 +47,10 @@ const HomePage = () => {
       const { token, user } = response.data;
       dispatch(setToken(token));
       dispatch(setUser(user));
+      toast.success('Login successful!');
     } catch (error) {
       console.error('Login failed', error);
-      alert('Login failed. Please check your credentials.');
+      toast.error('Login failed. Please check your credentials.');
     }
   };
 
@@ -55,6 +58,7 @@ const HomePage = () => {
     dispatch(clearAuth());
     setUsername('');
     setPassword('');
+    toast.info('Logged out successfully.');
   };
 
   return (
@@ -86,7 +90,7 @@ const HomePage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className={`w-full px-4 py-2 mt-4 border rounded-md text-gray-900${errors.password ? 'border-red-500' : ''}`}
+              className={`w-full px-4 py-2 mt-4 border rounded-md text-gray-900 ${errors.password ? 'border-red-500' : ''}`}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             <button
