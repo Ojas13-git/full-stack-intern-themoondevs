@@ -9,10 +9,37 @@ import axios from 'axios';
 const HomePage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
   const dispatch = useAppDispatch();
   const user = useAuthSession();
 
+  const validateForm = () => {
+    let formErrors: { username?: string; password?: string } = {};
+
+    if (!username) {
+      formErrors.username = 'Username is required';
+    } else if (username.length < 3) {
+      formErrors.username = 'Username must be at least 3 characters long';
+    }
+
+    if (!password) {
+      formErrors.password = 'Password is required';
+    } else if (password.length < 6) {
+      formErrors.password = 'Password must be at least 6 characters long';
+    } else if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+      formErrors.password = 'Password must contain both letters and numbers';
+    }
+
+    setErrors(formErrors);
+
+    return Object.keys(formErrors).length === 0;
+  };
+
   const handleLogin = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       const response = await axios.post('/api/login', { username, password });
       const { token, user } = response.data;
@@ -26,6 +53,8 @@ const HomePage = () => {
 
   const handleLogout = () => {
     dispatch(clearAuth());
+    setUsername('');
+    setPassword('');
   };
 
   return (
@@ -49,15 +78,17 @@ const HomePage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
-              className="w-full px-4 py-2 mt-4 border rounded-md text-gray-900"
+              className={`w-full px-4 py-2 mt-4 border rounded-md text-gray-900 ${errors.username ? 'border-red-500' : ''}`}
             />
+            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full px-4 py-2 mt-4 border rounded-md text-gray-900"
+              className={`w-full px-4 py-2 mt-4 border rounded-md text-gray-900${errors.password ? 'border-red-500' : ''}`}
             />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             <button
               onClick={handleLogin}
               className="w-full px-4 py-2 mt-6 font-bold text-white bg-blue-500 rounded-md"
