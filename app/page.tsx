@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { setToken } from '@/redux/auth/auth.slice';
 import useAuthSession from '../hooks/useAuthSession';
 import { useAppDispatch } from '@/redux/store';
+import axios from 'axios';
 
 const HomePage = () => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,19 @@ const HomePage = () => {
   const user = useAuthSession();
 
   const handleLogin = async () => {
-    // Implement the logic to authenticate the user
+    try {
+      const response = await axios.post('/api/login', { username, password });
+      const { token, user } = response.data;
+      dispatch(setToken(token));
+      dispatch(setUser(user));
+    } catch (error) {
+      console.error('Login failed', error);
+      alert('Login failed. Please check your credentials.');
+    }
+  };
+
+  const handleLogout = () => {
+    dispatch(clearAuth());
   };
 
   return (
